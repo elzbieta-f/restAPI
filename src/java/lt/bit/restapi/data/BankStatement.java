@@ -35,6 +35,7 @@ public class BankStatement {
      * @throws NullPointerException when line is null
      * @throws NumberFormatException when when amount is not decimal number;
      * @throws ParseException when date does not conform to specified pattern;
+     * @throws IllegalArgumentException if a line after split doesn't have the correct number of fields
      */
     public BankStatement(String line) throws ParseException {
         String[] parts = line.split(",");
@@ -46,6 +47,8 @@ public class BankStatement {
             this.comment = parts[3];
             this.amount = new BigDecimal(parts[4]);
             this.currency = parts[5];
+        } else {
+            throw new IllegalArgumentException("Provided line doesn't have the correct number of fields");
         }
     }
 

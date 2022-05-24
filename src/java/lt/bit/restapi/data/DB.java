@@ -19,7 +19,7 @@ import javax.servlet.ServletContext;
 
 public class DB {
 
-    public List<BankStatement> readData(ServletContext app) throws IOException, ParseException {
+    public static List<BankStatement> readData(ServletContext app) throws IOException {
         List<BankStatement> list = new ArrayList();
         try (
                 InputStream is = app.getResourceAsStream("/WEB-INF/bankStatements.csv");
@@ -27,7 +27,12 @@ public class DB {
                 BufferedReader br = new BufferedReader(r);) {
             String line;
             while ((line = br.readLine()) != null) {
-                list.add(new BankStatement(line));
+                try {
+                    list.add(new BankStatement(line));
+                } catch (IllegalArgumentException | ParseException ex){
+                    //if line can't be parsed the object will be skipped
+                }               
+
             }
         }
         return list;
@@ -62,5 +67,5 @@ public class DB {
                 filter(bs -> bs.getOperationDate().getTime() <= to.getTime()).
                 toList();
         return filteredList;
-    }  
+    }
 }
