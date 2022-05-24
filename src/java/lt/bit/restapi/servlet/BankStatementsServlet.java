@@ -15,7 +15,7 @@ import lt.bit.restapi.data.DB;
 
 import org.json.JSONObject;
 
-@WebServlet(name = "BankStatementsServlet", urlPatterns = {"/bankStatements"})
+@WebServlet(name = "BankStatementsServlet", urlPatterns = {"/bankStatements/*"})
 public class BankStatementsServlet extends HttpServlet {
 
     /**
@@ -30,11 +30,11 @@ public class BankStatementsServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<BankStatement> list = DB.readData(request.getServletContext());
         if (list != null) {
-            for (BankStatement bs : list) {
+            String temp = "[\n";
+            for (BankStatement bs : list) {                
                 String json = "{\n";
                 json += "\"accountNumber\": " + JSONObject.quote(bs.getAccountNumber()) + ",\n";
                 json += "\"operationDate\": " + JSONObject.quote(sdf.format(bs.getOperationDate())) + ",\n";
@@ -42,17 +42,22 @@ public class BankStatementsServlet extends HttpServlet {
                 json += "\"comment\": " + JSONObject.quote(bs.getComment()) + ",\n";
                 json += "\"amount\": " + bs.getAmount() + ",\n";
                 json += "\"currency\": " + JSONObject.quote(bs.getCurrency()) + "\n";
-                json += "}";
-                if (!list.listIterator().hasNext()){
-                } else {
-                    json+=",\n";
-                } 
-                response.getOutputStream().println(json);
+                json += "},";
+                temp += json;
             }
+            String jsonData = "";
+            if (temp.endsWith(",")) {
+                jsonData = temp.substring(0, temp.length() - 1)+"\n]";
+            }
+            PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            out.print(jsonData);
+            out.flush();
 
         } else {
             //If list wasn't found return an empty JSON object.
-            response.getOutputStream().println("{}");
+//            response.getOutputStream().println("{}");
         }
     }
 
