@@ -88,30 +88,32 @@ public class BankStatementsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fromStr = request.getParameter("from");
+        String toStr = request.getParameter("to");
+        Date from = null;
+        Date to = null;
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String fromStr = request.getParameter("from");
-            String toStr = request.getParameter("to");
-            Date from = null;
-            Date to = null;
-            try {
-                from = sdf.parse(fromStr);
-            } catch (ParseException ex) {
-                from = new Date(0);
-            }
-            try {
-                to = sdf.parse(toStr);
-            } catch (ParseException ex) {
-                to = new Date();
-            }
+            from = sdf.parse(fromStr);
+        } catch (ParseException ex) {
+            from = new Date(0);
+        }
+        try {
+            to = sdf.parse(toStr);
+        } catch (ParseException ex) {
+            to = new Date();
+        }
+        try {
             List<BankStatement> filteredByDate = DB.filterByDate(DB.readData(request.getServletContext()), from, to);
-            if (filteredByDate != null) {
-                String filename = "from" + sdf.format(from) + "to" + sdf.format(to);
-                DB.saveData(filteredByDate, filename);
+            
+            if (filteredByDate != null) {               
+                DB.saveData(request.getServletContext(), filteredByDate);               
             }
+            
             response.setStatus(200);
             response.sendRedirect("./");
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             response.setStatus(404);
             response.sendRedirect("./");
         }

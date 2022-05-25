@@ -2,6 +2,7 @@ package lt.bit.restapi.data;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +11,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,18 +31,19 @@ public class DB {
             while ((line = br.readLine()) != null) {
                 try {
                     list.add(new BankStatement(line));
-                } catch (IllegalArgumentException | ParseException ex){
+                } catch (IllegalArgumentException | ParseException ex) {
                     //if line can't be parsed the object will be skipped
-                }               
+                }
 
             }
         }
         return list;
     }
 
-    public static void saveData(List<BankStatement> list, String filename) throws IOException {
+    public static void saveData(ServletContext app, List<BankStatement> list) throws IOException {
+        URL url = app.getResource("/WEB-INF/filtered.csv");
         try (
-                OutputStream os = new FileOutputStream("/WEB-INF/"+filename + ".csv");
+                OutputStream os = new FileOutputStream(url.getFile());
                 Writer w = new OutputStreamWriter(os, "UTF-8");
                 BufferedWriter bw = new BufferedWriter(w);) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
