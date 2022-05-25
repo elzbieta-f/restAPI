@@ -40,7 +40,7 @@ public class DB {
 
     public static void saveData(List<BankStatement> list, String filename) throws IOException {
         try (
-                OutputStream os = new FileOutputStream(filename + ".csv");
+                OutputStream os = new FileOutputStream("/WEB-INF/"+filename + ".csv");
                 Writer w = new OutputStreamWriter(os, "UTF-8");
                 BufferedWriter bw = new BufferedWriter(w);) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -61,7 +61,7 @@ public class DB {
         }
     }
 
-    public List<BankStatement> filterByDate(List<BankStatement> list, Date from, Date to) {
+    public static List<BankStatement> filterByDate(List<BankStatement> list, Date from, Date to) {
         List<BankStatement> filteredList = list.stream().
                 filter(bs -> bs.getOperationDate().getTime() >= from.getTime()).
                 filter(bs -> bs.getOperationDate().getTime() <= to.getTime()).

@@ -10,8 +10,20 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="js/script.js"></script>
     </head>
-    <body>
-        <button onclick="showBankStatements()">Show All</button>
+    <body onload="showBankStatements()">
+        <h3>List of all bank stalements</h3>
         <div id="data"></div>
+        <h3>Export to CSV file by date:</h3>
+        <form action="bankStatements" method="POST">
+            <div>
+                <label for="from">Date from</label>
+                <input type="Date" id="from">
+            </div>
+            <div>
+                <label for="to">Date to</label>
+                <input type="Date" id="to">
+            </div>
+            <input type="submit" value="Export to CSV">            
+        </form>
     </body>
 </html>

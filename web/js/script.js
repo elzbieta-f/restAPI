@@ -17,6 +17,7 @@ async function getAll() {
     throw new Error(`Unknown status: ${res.statusText} (${res.status})`)
 }
 
+
 /**
  * Puts the fetched result from getAll() method to a HTML table  * 
  */
@@ -44,7 +45,7 @@ function showBankStatements() {
                 th.appendChild(document.createTextNode("Comment"));
                 tr.appendChild(th);
                 th = document.createElement("th");
-                th.appendChild(document.createTextNode("Ammount"));
+                th.appendChild(document.createTextNode("Amount"));
                 tr.appendChild(th);
                 th = document.createElement("th");
                 th.appendChild(document.createTextNode("Currency"));
@@ -79,5 +80,7 @@ function showBankStatements() {
                 alert("Failed to load list: " + err.message);
             });
 }
+
+
 
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -34,7 +35,7 @@ public class BankStatementsServlet extends HttpServlet {
         List<BankStatement> list = DB.readData(request.getServletContext());
         if (list != null) {
             String temp = "[\n";
-            for (BankStatement bs : list) {                
+            for (BankStatement bs : list) {
                 String json = "{\n";
                 json += "\"accountNumber\": " + JSONObject.quote(bs.getAccountNumber()) + ",\n";
                 json += "\"operationDate\": " + JSONObject.quote(sdf.format(bs.getOperationDate())) + ",\n";
@@ -47,7 +48,7 @@ public class BankStatementsServlet extends HttpServlet {
             }
             String jsonData = "";
             if (temp.endsWith(",")) {
-                jsonData = temp.substring(0, temp.length() - 1)+"\n]";
+                jsonData = temp.substring(0, temp.length() - 1) + "\n]";
             }
             PrintWriter out = response.getWriter();
             response.setContentType("application/json");
@@ -87,7 +88,34 @@ public class BankStatementsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String fromStr = request.getParameter("from");
+            String toStr = request.getParameter("to");
+            Date from = null;
+            Date to = null;
+            try {
+                from = sdf.parse(fromStr);
+            } catch (ParseException ex) {
+                from = new Date(0);
+            }
+            try {
+                to = sdf.parse(toStr);
+            } catch (ParseException ex) {
+                to = new Date();
+            }
+            List<BankStatement> filteredByDate = DB.filterByDate(DB.readData(request.getServletContext()), from, to);
+            if (filteredByDate != null) {
+                String filename = "from" + sdf.format(from) + "to" + sdf.format(to);
+                DB.saveData(filteredByDate, filename);
+            }
+            response.setStatus(200);
+            response.sendRedirect("./");
+        } catch (Exception ex) {
+            response.setStatus(404);
+            response.sendRedirect("./");
+        }
+
     }
 
     /**
