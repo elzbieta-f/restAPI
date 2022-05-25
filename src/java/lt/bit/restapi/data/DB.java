@@ -16,7 +16,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.ServletContext;
 
 public class DB {
@@ -63,11 +65,26 @@ public class DB {
             os.flush();
         }
     }
+    
+    public static Set<String> getAccounts(ServletContext app) throws IOException {
+        Set<String> set = new HashSet();
+        List<BankStatement> list=readData(app);
+        for (BankStatement bs : list) {
+            set.add(bs.getAccountNumber());
+        }
+        return set;
+    }
 
     public static List<BankStatement> filterByDate(List<BankStatement> list, Date from, Date to) {
         List<BankStatement> filteredList = list.stream().
-                filter(bs -> bs.getOperationDate().getTime() >= from.getTime()).
-                filter(bs -> bs.getOperationDate().getTime() <= to.getTime()).
+                filter(bs -> bs.getOperationDate().getTime() >= from.getTime()&& 
+                        bs.getOperationDate().getTime() <= to.getTime()).
+                toList();
+        return filteredList;
+    }
+    public static List<BankStatement> filterByAccountNumber(List<BankStatement> list, String an){
+        List<BankStatement> filteredList = list.stream().
+                filter(bs -> an.equals(bs.getAccountNumber())).
                 toList();
         return filteredList;
     }
